@@ -1,10 +1,11 @@
 const express = require("express");
 
-const authRoutes    = require("./routes/authRoutes");
-const clienteRoutes = require("./routes/clienteRoutes");
-const produtoRoutes = require("./routes/produtoRoutes");
-const pedidoRoutes  = require("./routes/pedidoRoutes");
-const itemRoutes    = require("./routes/itemRoutes");
+const authRoutes     = require("./routes/authRoutes");
+const usuarioRoutes  = require("./routes/usuarioRoutes");
+const clienteRoutes  = require("./routes/clienteRoutes");
+const produtoRoutes  = require("./routes/produtoRoutes");
+const pedidoRoutes   = require("./routes/pedidoRoutes");
+const itemRoutes     = require("./routes/itemRoutes");
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 
 // Rotas
 app.use("/login",    authRoutes);
+app.use("/usuarios", usuarioRoutes);
 app.use("/clientes", clienteRoutes);
 app.use("/produtos", produtoRoutes);
 app.use("/pedidos",  pedidoRoutes);

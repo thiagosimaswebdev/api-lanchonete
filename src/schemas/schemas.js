@@ -1,14 +1,31 @@
 const Joi = require("joi");
 
 const schemas = {
+  cadastro: Joi.object({
+    nome: Joi.string().min(2).max(100).required().messages({
+      "string.min": "Nome deve ter pelo menos 2 caracteres",
+      "string.max": "Nome deve ter no máximo 100 caracteres",
+      "any.required": "Nome é obrigatório",
+    }),
+    usuario: Joi.string().min(3).max(50).required().messages({
+      "string.min": "Usuário deve ter pelo menos 3 caracteres",
+      "string.max": "Usuário deve ter no máximo 50 caracteres",
+      "any.required": "Usuário é obrigatório",
+    }),
+    senha: Joi.string().min(6).required().messages({
+      "string.min": "Senha deve ter pelo menos 6 caracteres",
+      "any.required": "Senha é obrigatória",
+    }),
+  }),
+
   login: Joi.object({
     usuario: Joi.string().min(3).max(50).required().messages({
       "string.min": "Usuário deve ter pelo menos 3 caracteres",
       "string.max": "Usuário deve ter no máximo 50 caracteres",
       "any.required": "Usuário é obrigatório",
     }),
-    senha: Joi.string().min(4).required().messages({
-      "string.min": "Senha deve ter pelo menos 4 caracteres",
+    senha: Joi.string().min(6).required().messages({
+      "string.min": "Senha deve ter pelo menos 6 caracteres",
       "any.required": "Senha é obrigatória",
     }),
   }),
