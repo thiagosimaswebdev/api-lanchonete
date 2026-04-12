@@ -2,20 +2,58 @@ const pool = require("../config/db");
 
 async function listarPedidos(req, res) {
   try {
-    const resultado = await pool.query(`
-      SELECT
+    const { status, page, limit } = req.query;
+
+    // Paginação
+    const pagina = Math.max(1, parseInt(page) || 1);
+    const limite = Math.min(50, Math.max(1, parseInt(limit) || 10));
+    const offset = (pagina - 1) * limite;
+
+    // Monta a query base com filtro opcional por status
+    let filtro = "";
+    const params = [];
+
+    if (status) {
+      const statusValidos = ["pendente", "em_preparo", "pronto", "entregue", "cancelado"];
+      if (!statusValidos.includes(status)) {
+        return res.status(400).json({
+          erro: "Status inválido. Use: pendente, em_preparo, pronto, entregue ou cancelado",
+        });
+      }
+      filtro = `WHERE p.status = $1`;
+      params.push(status);
+    }
+
+    // Busca o total de pedidos para montar a paginação
+    const totalResult = await pool.query(
+      `SELECT COUNT(DISTINCT p.id) AS total
+       FROM pedidos p
+       JOIN clientes c ON p.cliente_id = c.id
+       ${filtro}`,
+      params
+    );
+
+    const total = parseInt(totalResult.rows[0].total);
+    const totalPaginas = Math.ceil(total / limite);
+
+    // Busca os pedidos com limite e offset
+    const resultado = await pool.query(
+      `SELECT
         p.id         AS pedido_id,
         c.nome       AS cliente,
         p.status,
         pr.nome      AS produto,
         ip.quantidade,
         ip.preco_unitario
-      FROM pedidos p
-      JOIN clientes c ON p.cliente_id = c.id
-      LEFT JOIN itens_pedido ip ON ip.pedido_id = p.id
-      LEFT JOIN produtos pr ON pr.id = ip.produto_id
-      ORDER BY p.id DESC
-    `);
+       FROM pedidos p
+       JOIN clientes c ON p.cliente_id = c.id
+       LEFT JOIN itens_pedido ip ON ip.pedido_id = p.id
+       LEFT JOIN produtos pr ON pr.id = ip.produto_id
+       ${filtro}
+       ORDER BY p.id DESC
+       LIMIT ${limite} OFFSET ${offset}`,
+      params
+    );
 
     const pedidos = {};
 
@@ -44,7 +82,13 @@ async function listarPedidos(req, res) {
       }
     });
 
-    res.json(Object.values(pedidos));
+    res.json({
+      pagina: pagina,
+      limite: limite,
+      total: total,
+      total_paginas: totalPaginas,
+      pedidos: Object.values(pedidos),
+    });
   } catch (erro) {
     console.error("[GET /pedidos]", erro);
     res.status(500).json({ erro: "Erro ao buscar pedidos" });
