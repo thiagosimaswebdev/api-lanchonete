@@ -2,7 +2,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const pool = require("../config/db");
 
-const JWT_SECRET = process.env.JWT_SECRET || "troque_em_producao";
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET não definido nas variáveis de ambiente!");
+}
 const JWT_EXPIRES_IN = "8h";
 const SALT_ROUNDS = 10;
 
