@@ -1,11 +1,13 @@
 const express = require("express");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 
-const authRoutes     = require("./routes/authRoutes");
-const usuarioRoutes  = require("./routes/usuarioRoutes");
-const clienteRoutes  = require("./routes/clienteRoutes");
-const produtoRoutes  = require("./routes/produtoRoutes");
-const pedidoRoutes   = require("./routes/pedidoRoutes");
-const itemRoutes     = require("./routes/itemRoutes");
+const authRoutes    = require("./routes/authRoutes");
+const usuarioRoutes = require("./routes/usuarioRoutes");
+const clienteRoutes = require("./routes/clienteRoutes");
+const produtoRoutes = require("./routes/produtoRoutes");
+const pedidoRoutes  = require("./routes/pedidoRoutes");
+const itemRoutes    = require("./routes/itemRoutes");
 
 const app = express();
 app.use(express.json());
@@ -14,6 +16,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("<h1>API Lanchonete 🍔</h1>");
 });
+
+// Documentação Swagger
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Rotas
 app.use("/login",    authRoutes);
